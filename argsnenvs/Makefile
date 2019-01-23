@@ -26,6 +26,7 @@ build-info: ## Show build info
 	echo "$(APPNAME) $(APPVERSION) [$(BASEIMAGE) $(BASEIMAGEVERSION)] $(BUILD_TIME)"
 
 clean: ## Delete image
+	docker container rm `docker container ls -aq --filter ancestor=$(APPNAME):$(APPVERSION)`
 	docker image rm $(APPNAME):$(APPVERSION)
 
 build: ## Build the docker image
