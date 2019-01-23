@@ -6,6 +6,8 @@
 
 ## Usage
 
+### Build
+
 Build your image using defaults
 ```
 make build
@@ -24,6 +26,8 @@ or the manual way,
 docker build --build-arg BASEIMAGEVERSION=<alpine_ver> -t <name>:<ver> .
 ```
 
+### Run
+
 Run your image in a container
 ```
 make run
@@ -41,6 +45,8 @@ or the manual way,
 ```
 docker run -it --env ENVIRO1=<value> <name>:<ver> /bin/sh
 ```
+
+### Clean
 
 Clean up your containers and images
 ```
