@@ -1,5 +1,11 @@
 # Explore ARGs and ENVs in Docker Build and Run
 
+Docker ARGs and ENVs are sometimes confused, but have very different scopes.
+
+ARGs are used only in the FROM statement and can be used toset the base image, base image version or specify an alias for the build stage.  ARGs can be overridden at build-time.
+
+ENVs are declared in the Dockerfile for variable substitution or usage in the underlying image.  These ENVs can be overridden at runtime.
+
 ## Requirements
 
 - Docker
