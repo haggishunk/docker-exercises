@@ -52,6 +52,18 @@ or the manual way,
 docker run -it --env ENVIRO1=<value> <name>:<ver> /bin/sh
 ```
 
+Inside the container you can see the Dockerfile-specified environment variable ENVIRO1 is present as a file
+```
+/ # cat message
+from the past
+```
+
+While the environment variable ENVIRO1 shows the value shows the value you specified in the run command previously.
+```
+/ # echo $ENVIRO1
+i am from the outside
+```
+
 ### Clean
 
 Clean up your containers and images
