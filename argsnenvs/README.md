@@ -14,7 +14,7 @@ ENVs are declared in the Dockerfile for variable substitution or usage in the un
 
 ### Build
 
-Build your image using defaults
+Build your image using defaults (at the time of writing alpine:latest is 3.5)
 ```
 make build
 ```
@@ -29,7 +29,7 @@ make build BASEIMAGEVERSION=3.1
 ```
 or the manual way,
 ```
-docker build --build-arg BASEIMAGEVERSION=<alpine_ver> -t argsnenvs:1.1 .
+docker build --build-arg BASEIMAGEVERSION=3.1 -t argsnenvs:1.1 .
 ```
 
 ### Run
