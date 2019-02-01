@@ -4,7 +4,7 @@ Docker containers are almost always interacted with via network connections. Doc
 
 It is important to note that these connections are like port mapping.  An external request to the container connects with a published port which then gets routed to a (possibly different) internal port that the application in the container listens on.
 
-The EXPOSE keyword is part of the Dockerfile and is used as way to communicate to the user of the image what port the containerized application listens to.  An advanced usage of the -P flag to the docker run command can automatically publish any EXPOSE-d ports in the Dockerfile to arbitrary ports above 32767.  While an nondeterminate port might be troublesome for some users, a docker network on a host allows several containers to communicate easily even with these conditions.
+The EXPOSE keyword is part of the Dockerfile and is used as way to communicate to the user of the image what port the containerized application listens to.  An advanced usage of the -P flag to the docker run command can automatically publish any EXPOSE-d ports in the Dockerfile to arbitrary ports above 32767.  While an indeterminate port might be troublesome for some users, a docker network on a host allows several containers to communicate easily even with these conditions.
 
 ## Requirements
 
@@ -94,11 +94,17 @@ or the manual way
 
 use this command to stop Docker containers running the image you built
 ```
-docker stop `docker ps -aq --filter ancestor=publish-and-expose:1.0`
+docker stop \
+  $(docker ps \
+  -aq \
+  --filter ancestor=publish-and-expose:1.0)
 ```
 Then remove all the containers that were running the image
 ```
-docker container rm `docker container ls -aq --filter ancestor=publish-and-expose:1.0`
+docker container rm \
+  $(docker container ls \
+  -aq \
+  --filter ancestor=publish-and-expose:1.0)
 ```
 Remove the base image
 ```
