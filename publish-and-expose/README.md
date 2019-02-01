@@ -1,4 +1,4 @@
-# Explore ARGs and ENVs in Docker Build and Run
+# Explore Dockerfile EXPOSE and Docker Run Port Publishing
 
 Docker containers are almost always interacted with via network connections. Docker has two conventions to manage the ports that a container can be reached through:  EXPOSE and PUBLISH.
 
