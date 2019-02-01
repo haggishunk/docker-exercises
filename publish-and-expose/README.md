@@ -1,10 +1,10 @@
 # Explore ARGs and ENVs in Docker Build and Run
 
-Docker ARGs and ENVs are sometimes confused, but have very different scopes.
+Docker containers are almost always interacted with via network connections. Docker has two conventions to manage the ports that a container can be reached through:  EXPOSE and PUBLISH.
 
-ARGs are used only in the FROM statement and can be used toset the base image, base image version or specify an alias for the build stage.  ARGs can be overridden at build-time.
+It is important to note that these connections are like port mapping.  An external request to the container connects with a published port which then gets routed to a (possibly different) internal port that the application in the container listens on.
 
-ENVs are declared in the Dockerfile for variable substitution or usage in the underlying image.  These ENVs can be overridden at runtime.
+The EXPOSE keyword is part of the Dockerfile and is used as way to communicate to the user of the image what port the containerized application listens to.  An advanced usage of the -P flag to the docker run command can automatically publish any EXPOSE-d ports in the Dockerfile to arbitrary ports above 32767.  While an nondeterminate port might be troublesome for some users, a docker network on a host allows several containers to communicate easily even with these conditions.
 
 ## Requirements
 
@@ -20,16 +20,7 @@ make build
 ```
 or the manual way,
 ```
-docker build -t argsnenvs:1.0 .
-```
-
-Build your image with a different base image or version
-```
-make build BASEIMAGEVERSION=3.1
-```
-or the manual way,
-```
-docker build --build-arg BASEIMAGEVERSION=3.1 -t argsnenvs:1.1 .
+docker build -t publish-and-expose:1.0 .
 ```
 
 ### Run
@@ -40,41 +31,58 @@ make run
 ```
 or the manual way,
 ```
-docker run -it argsnenvs:1.0 /bin/sh
+docker run -d publish-and-expose:1.0 /bin/sh
 ```
 
-Inside the container you can see the Dockerfile-specified environment variable ENVIRO1 is present as a file called `message` 
+But can the nginx server be reached?  By default nginx listens on port 80...
 ```
-/ # cat message
-from the past
-```
-
-The environment variable ENVIRO1 also shows the value set by the Dockerfile.
-```
-/ # echo $ENVIRO1
-here and now
+$ curl localhost:80
+curl: (7) Failed to connect to localhost port 80: Connection refused
 ```
 
-This time, run your image in a container and inject an environment variable
+Well, we didn't ever specify the port to *publish* the container on.
 ```
-make run ENVIRO1="i am from the outside"
+make run-publish
 ```
-or the manual way,
+or the manual way
 ```
-docker run -it --env ENVIRO1="i am from the outside" argsnenvs:1.0 /bin/sh
-```
-
-The container still has the same content in the file `message`
-```
-/ # cat message
-from the past
+docker run -d -p 8080:80 publish-and-expose:1.0
 ```
 
-While the environment variable ENVIRO1 shows the value you specified in the run command previously.
+This time we mapped your host's port 8080 to route traffic to port 80 inside the container.  You should see the default nginx welcome page.
 ```
-/ # echo $ENVIRO1
-i am from the outside
+$ curl localhost:8080
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+...
 ```
+
+Now let's explore how the -P flag and the EXPOSE keyword can work for us.
+```
+make run-automap
+```
+or
+```
+docker run -d -P publish-and-expose:1.0
+```
+
+What port is it on?
+```
+$ docker ps
+CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS              PORTS                   NAMES
+085597dcb058        publish-and-expose:1.0   "nginx -g 'daemon of…"   3 seconds ago       Up 1 second         0.0.0.0:32772->80/tcp   publish-and-expose-automap
+...
+```
+
+Make an http request to the port shown on the image, in the above example 32772.
+```
+$ curl localhost:32772
+```
+And you should see the familiar nginx welcome site.
 
 ### Clean
 
@@ -84,16 +92,15 @@ make clean
 ```
 or the manual way
 
-use this command to list Docker containers using the image you built
+use this command to stop Docker containers running the image you built
 ```
-docker container ls -a --filter ancestor=argsnenvs:1.0
+docker stop `docker ps -aq --filter ancestor=publish-and-expose:1.0`
 ```
-or quietly to return a list of container ids (this is useful for supply other commands with input)
+Then remove all the containers that were running the image
 ```
-docker container ls -aq --filter ancestor=argsnenvs:1.0
+docker container rm `docker container ls -aq --filter ancestor=publish-and-expose:1.0`
 ```
-supply that list to docker container rm
+Remove the base image
 ```
-docker container rm $(docker container ls -aq --filter ancestor=argsnenvs:1.0)
+docker image rm publish-and-expose:1.0
 ```
-
