@@ -1,13 +1,3 @@
-SHELL := $(shell which bash)
-ENV = /usr/bin/env
-
-.SHELLFLAGS = -c
-
-.SILENT: ;
-.ONESHELL: ;
-.NOTPARALLEL: ;
-.EXPORT_ALL_VARIABLES: ;
-
 .PHONY: all
 .DEFAULT: help
 
@@ -25,7 +15,7 @@ help: ## Show Help
 build-info: ## Show build info
 	echo "$(APPNAME) $(APPVERSION) [$(BASEIMAGE) $(BASEIMAGEVERSION)] $(BUILD_TIME)"
 
-clean: ## Delete image
+clean: ## Delete containers and image
 	docker container rm `docker container ls -aq --filter ancestor=$(APPNAME):$(APPVERSION)`
 	docker image rm $(APPNAME):$(APPVERSION)
 
@@ -34,6 +24,3 @@ build: ## Build the docker image
 
 run: ## Run the image
 	docker run -it --env ENVIRO1=$(ENVIRO1) $(APPNAME):$(APPVERSION) /bin/sh
-
-push: ## Push image to remote repo
-	echo "Nothing yet"
