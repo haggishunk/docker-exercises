@@ -17,7 +17,7 @@ build-info: ## Show build info
 	echo "$(APPNAME) $(APPVERSION) $(BUILD_TIME)"
 
 clean: ## Stop all running containers, delete the containers and image
-	docker kill `docker ps -aq --filter ancestor=$(APPNAME):$(APPVERSION)`
+	docker stop `docker ps -aq --filter ancestor=$(APPNAME):$(APPVERSION)`
 	docker container rm `docker container ls -aq --filter ancestor=$(APPNAME):$(APPVERSION)`
 	docker image rm $(APPNAME):$(APPVERSION)
 
@@ -25,10 +25,10 @@ build: ## Build the docker image
 	docker build -t $(APPNAME):$(APPVERSION) .
 
 run: ## Run the image without specifying any port publishing
-	docker run -d $(APPNAME):$(APPVERSION)
+	docker run -d --name $(APPNAME) $(APPNAME):$(APPVERSION)
 
 run-publish: ## Run the image and specifying the port to publish
-	docker run -d -p $(PORT_OUTSIDE):$(PORT_INSIDE) $(APPNAME):$(APPVERSION)
+	docker run -d --name $(APPNAME)-publish -p $(PORT_OUTSIDE):$(PORT_INSIDE) $(APPNAME):$(APPVERSION)
 
 run-automap: ## Run the image and let docker automatically map the host port
-	docker run -d -P $(APPNAME):$(APPVERSION)
+	docker run -d --name $(APPNAME)-automap -P $(APPNAME):$(APPVERSION)
